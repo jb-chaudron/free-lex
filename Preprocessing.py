@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 # 1 - Ouverture des fichiers
-path = "/content/data_Chinese.csv"
+path = "~/wiki_clust/data_ress/data_Chinese.csv"
 df = pd.read_csv(path)
 
 
@@ -93,13 +93,16 @@ df_all = (df.pipe(low)
 m_phon = hddm.HDDM(df_phon)
 m_phon.find_starting_values()
 m_phon.sample(2000, burn=20,dbname='traces_phon.db', db='pickle')
+m_phon.save("model_phon")
 
 ## 4.2 - Purement Semantique
 m_sem = hddm.HDDM(df_sem)
 m_sem.find_starting_values()
 m_sem.sample(2000, burn=20,dbname='traces_sem.db', db='pickle')
+m_sem.save("model_sem")
 
 ## 4.3 - Les deux à la fois
 m_all = hddm.HDDM(df_all)
 m_all.find_starting_values()
 m_all.sample(2000, burn=20,dbname='traces_tt.db', db='pickle')
+m_all.save("model_tt")
