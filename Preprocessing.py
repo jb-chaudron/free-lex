@@ -87,22 +87,34 @@ df_all = (df.pipe(low)
     .pipe(sumbsamp,col="phonsem")
     .pipe(flot))
 
-# 4 - Production du modèle
+# 4 - Production des modèles
+
+
 
 ## 4.1 - Purement Phonologique
 m_phon = hddm.HDDM(df_phon)
 m_phon.find_starting_values()
-m_phon.sample(2000, burn=20,dbname='traces_phon.db', db='pickle')
-m_phon.save("model_phon")
 
 ## 4.2 - Purement Semantique
 m_sem = hddm.HDDM(df_sem)
 m_sem.find_starting_values()
-m_sem.sample(2000, burn=20,dbname='traces_sem.db', db='pickle')
-m_sem.save("model_sem")
 
 ## 4.3 - Les deux à la fois
 m_all = hddm.HDDM(df_all)
 m_all.find_starting_values()
-m_all.sample(2000, burn=20,dbname='traces_tt.db', db='pickle')
-m_all.save("model_tt")
+
+# 4.4 - Fonction de Fit
+def fitting(ddm):
+    obj = ddm[0]
+    nom = ddm[1]
+
+    obj.sample(2000, burn=200,thin=5,dbname='traces_{}.db'.format(nom), db='pickle')
+    obj.save("model_{}".format(nom))
+
+pool = multiprocessing.Pool(12)
+
+objets = [[m_phon,"phon"],[m_sem,"sem"],[m_all,"tt"]]
+objets = reduce(lambda a,b: a+b,[[[x[0],x[1]+str(y)] for y in range(4)] for x in objets])
+print(objets)
+
+pool.map(fitting,objets)
